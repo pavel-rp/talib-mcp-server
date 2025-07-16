@@ -25,7 +25,14 @@ def test_auth(client):
 
 
 def test_call_sma(client):
-    payload = {"name": "sma", "arguments": {"prices": list(range(1, 11)), "period": 5}}
-    r = client.post("/call", json=payload, headers={"Authorization": "Bearer testtoken"})
+    payload = {
+        "name": "sma",
+        "arguments": {"prices": list(range(1, 11)), "period": 5},
+    }
+    r = client.post(
+        "/call",
+        json=payload,
+        headers={"Authorization": "Bearer testtoken"},
+    )
     assert r.status_code == 200
     assert "result" in r.json()
