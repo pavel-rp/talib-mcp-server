@@ -21,6 +21,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
+ENV TA_INCLUDE_PATH=/usr/include TA_LIBRARY_PATH=/usr/lib
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
