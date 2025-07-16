@@ -14,9 +14,6 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=False)
 mcp = FastMCP(
     name="talib-mcp-server",
     instructions="Stateless TA-Lib indicators. Provide prices oldest→newest.",
-    transport="http",
-    host="0.0.0.0",
-    port=8000,
 )
 
 # Attach auth middleware
@@ -62,4 +59,4 @@ def bbands(
 
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="http", host="0.0.0.0", port=8000)
