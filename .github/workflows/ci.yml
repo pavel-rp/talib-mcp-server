@@ -28,6 +28,9 @@ jobs:
           wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
           tar -xzf ta-lib-0.4.0-src.tar.gz
           cd ta-lib && ./configure --prefix=/usr && make -j"$(nproc)" && sudo make install
+          # Ensure headers present where Python wrapper expects
+          sudo cp -r include/ta-lib /usr/include/ || true
+          sudo ldconfig
           cd .. && rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
       - name: Install dependencies

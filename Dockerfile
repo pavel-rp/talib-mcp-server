@@ -14,9 +14,11 @@ RUN apt-get update && \
     ./configure --prefix=/usr && \
     make -j"$(nproc)" && \
     make install && \
+    # Ensure headers directory exists in /usr/include for Python wrapper
+    cp -r include/ta-lib /usr/include/ || true && \
+    ldconfig && \
     cd /app && \
     rm -rf ta-lib ta-lib-0.4.0-src.tar.gz && \
-    ldconfig && \
     apt-get purge -y --auto-remove wget && \
     rm -rf /var/lib/apt/lists/*
 
