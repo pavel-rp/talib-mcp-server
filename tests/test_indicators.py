@@ -1,4 +1,3 @@
-import math
 import pathlib
 import sys
 
@@ -17,12 +16,6 @@ prices = [44.0, 44.34, 44.09, 44.15, 43.61, 44.33, 44.83, 45.15, 45.42, 45.84,
           46.08, 45.89, 46.03, 46.28, 46.28, 46.00, 46.03, 46.41, 46.22, 45.64,
           45.89, 46.25, 46.23, 46.08, 46.03, 46.83, 46.69, 46.49, 46.26, 46.09,
           45.81, 45.68, 45.57, 45.56, 45.51, 45.02, 44.84, 44.69, 44.62, 44.60]
-
-
-def _clean(a):
-    """Clean list for comparison, handling None and NaN values."""
-    return [None if x is None or (isinstance(x, float) and math.isnan(x))
-            else pytest.approx(float(x), abs=1e-2) for x in a]
 
 
 def test_rsi():
