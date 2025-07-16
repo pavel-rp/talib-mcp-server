@@ -51,10 +51,9 @@ def sma(prices: list[float], period: int = 10) -> list[float | None]:
 def bbands(
     prices: list[float],
     period: int = 20,
-    upper_dev: float = 2.0,
-    lower_dev: float = 2.0,
+    std_dev: float = 2.0,
 ) -> dict[str, list[float | None]]:
-    return indicators.bbands(prices, period, upper_dev, lower_dev)
+    return indicators.bbands(prices, period, std_dev)
 
 
 # Expose app for testing
