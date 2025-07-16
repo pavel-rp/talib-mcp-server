@@ -72,10 +72,10 @@ talib-mcp-server/
 | Tool | Signature | Description |
 |------|-----------|-------------|
 | `rsi` | `rsi(prices: List[float], period: int = 14)` | Relative Strength Index |
-| `macd` | `macd(prices: List[float], fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9)` | MACD line, signal & histogram |
-| `ema` | `ema(prices: List[float], period: int = 10)` | Exponential Moving Average |
-| `sma` | `sma(prices: List[float], period: int = 10)` | Simple Moving Average |
-| `bbands` | `bbands(prices: List[float], period: int = 20, nbdevup: float = 2.0, nbdevdn: float = 2.0)` | Bollinger Bands upper/middle/lower |
+| `macd` | `macd(prices: List[float], fast: int = 12, slow: int = 26, signal: int = 9)` | MACD line, signal & histogram |
+| `ema` | `ema(prices: List[float], period: int)` | Exponential Moving Average |
+| `sma` | `sma(prices: List[float], period: int)` | Simple Moving Average |
+| `bbands` | `bbands(prices: List[float], period: int = 20, std_dev: float = 2.0)` | Bollinger Bands upper/middle/lower |
 
 All outputs are JSON-serialisable (floats or `null` when the value cannot yet be computed).
 
