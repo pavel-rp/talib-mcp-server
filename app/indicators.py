@@ -21,8 +21,6 @@ def _validate_period(period: int, prices: list[float]):
     """Validate period parameter."""
     if period <= 0:
         raise ValueError("period must be positive")
-    if period > len(prices):
-        raise ValueError("period cannot exceed length of prices")
 
 
 def rsi(prices: list[float], period: int = 14) -> list[float | None]:
