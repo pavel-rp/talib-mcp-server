@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from typing import List, Dict
-
 import numpy as np
 import talib  # type: ignore
 
 __all__ = ["rsi", "macd", "ema", "sma", "bbands"]
 
 
-def _to_list(arr: np.ndarray) -> List[float | None]:
+def _to_list(arr: np.ndarray) -> list[float | None]:
     return [None if np.isnan(v) else float(v) for v in arr]
 
 
-def _validate_prices(prices: List[float]):
+def _validate_prices(prices: list[float]):
     if not isinstance(prices, list) or not prices:
         raise ValueError("'prices' must be a non-empty list")
     if not all(isinstance(p, (int, float)) for p in prices):
@@ -24,7 +22,7 @@ def _validate_positive(value, name="value"):
         raise ValueError(f"{name} must be positive")
 
 
-def _validate_period(period: int, prices: List[float]):
+def _validate_period(period: int, prices: list[float]):
     _validate_positive(period, "period")
     if period > len(prices):
         raise ValueError("period cannot exceed length of prices")
@@ -35,7 +33,7 @@ def _validate_period(period: int, prices: List[float]):
 # ---------------------------------------------------------------------------
 
 
-def rsi(prices: List[float], period: int = 14) -> List[float | None]:
+def rsi(prices: list[float], period: int = 14) -> list[float | None]:
     """Compute the Relative Strength Index (RSI).
 
     Parameters
@@ -68,11 +66,11 @@ def rsi(prices: List[float], period: int = 14) -> List[float | None]:
 
 # fmt: off
 def macd(
-    prices: List[float],
+    prices: list[float],
     fastperiod: int = 12,
     slowperiod: int = 26,
     signalperiod: int = 9,
-) -> Dict[str, List[float | None]]:
+) -> dict[str, list[float | None]]:
     """Moving Average Convergence / Divergence (MACD).
 
     Parameters
@@ -121,7 +119,7 @@ def macd(
 # fmt: on
 
 
-def ema(prices: List[float], period: int = 10) -> List[float | None]:
+def ema(prices: list[float], period: int = 10) -> list[float | None]:
     """Exponential Moving Average (EMA).
 
     Parameters
@@ -143,7 +141,7 @@ def ema(prices: List[float], period: int = 10) -> List[float | None]:
     return _to_list(res)
 
 
-def sma(prices: List[float], period: int = 10) -> List[float | None]:
+def sma(prices: list[float], period: int = 10) -> list[float | None]:
     """Simple Moving Average (SMA).
 
     Identical to Excel's *AVERAGE* over a sliding window.
@@ -157,11 +155,11 @@ def sma(prices: List[float], period: int = 10) -> List[float | None]:
 
 # fmt: off
 def bbands(
-    prices: List[float],
+    prices: list[float],
     period: int = 20,
     nbdevup: float = 2.0,
     nbdevdn: float = 2.0,
-) -> Dict[str, List[float | None]]:
+) -> dict[str, list[float | None]]:
     """Bollinger Bands® (BBANDS).
 
     Parameters

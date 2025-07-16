@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict
 
 from dotenv import load_dotenv
 from fastmcp import FastMCP
@@ -24,37 +24,37 @@ except AttributeError:
 
 
 @mcp.tool()
-def rsi(prices: List[float], period: int = 14) -> List[float | None]:
+def rsi(prices: list[float], period: int = 14) -> list[float | None]:
     return indicators.rsi(prices, period)
 
 
 @mcp.tool()
 def macd(
-    prices: List[float],
+    prices: list[float],
     fastperiod: int = 12,
     slowperiod: int = 26,
     signalperiod: int = 9,
-) -> Dict[str, List[float | None]]:
+) -> dict[str, list[float | None]]:
     return indicators.macd(prices, fastperiod, slowperiod, signalperiod)
 
 
 @mcp.tool()
-def ema(prices: List[float], period: int = 10) -> List[float | None]:
+def ema(prices: list[float], period: int = 10) -> list[float | None]:
     return indicators.ema(prices, period)
 
 
 @mcp.tool()
-def sma(prices: List[float], period: int = 10) -> List[float | None]:
+def sma(prices: list[float], period: int = 10) -> list[float | None]:
     return indicators.sma(prices, period)
 
 
 @mcp.tool()
 def bbands(
-    prices: List[float],
+    prices: list[float],
     period: int = 20,
     nbdevup: float = 2.0,
     nbdevdn: float = 2.0,
-) -> Dict[str, List[float | None]]:
+) -> dict[str, list[float | None]]:
     return indicators.bbands(prices, period, nbdevup, nbdevdn)
 
 
