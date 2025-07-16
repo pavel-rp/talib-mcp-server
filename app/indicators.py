@@ -36,18 +36,74 @@ def _validate_period(period: int, prices: List[float]):
 
 
 def rsi(prices: List[float], period: int = 14) -> List[float | None]:
+    """Compute the Relative Strength Index (RSI).
+
+    Parameters
+    ----------
+    prices : List[float]
+        Historical *close* prices in **chronological** order (oldest ➜ newest).
+        The list **must not** be empty.  All values must be numeric.
+    period : int, default 14
+        RSI period length in bars.  Must be a positive integer that does not
+        exceed the length of *prices*.
+
+    Returns
+    -------
+    List[float | None]
+        A list of RSI values aligned 1-to-1 with the input *prices*.
+        Elements where the RSI cannot yet be computed are returned as
+        ``None`` so that the result remains JSON-serialisable.
+
+    Examples
+    --------
+    >>> rsi([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    [..., 70.71]
+    """
+
     _validate_prices(prices)
     _validate_period(period, prices)
     res = talib.RSI(np.array(prices, dtype=float), timeperiod=period)
     return _to_list(res)
 
 
+# fmt: off
 def macd(
     prices: List[float],
     fastperiod: int = 12,
     slowperiod: int = 26,
     signalperiod: int = 9,
 ) -> Dict[str, List[float | None]]:
+    """Moving Average Convergence / Divergence (MACD).
+
+    Parameters
+    ----------
+    prices : List[float]
+        Close prices (chronological order).
+    fastperiod : int, default 12
+        Period for the *fast* EMA.
+    slowperiod : int, default 26
+        Period for the *slow* EMA.
+    signalperiod : int, default 9
+        Period for the signal EMA calculated from the MACD line.
+
+    Returns
+    -------
+    dict
+        Dictionary with three keys:
+
+        * ``macd``   – the MACD line
+        * ``signal`` – the signal line
+        * ``hist``   – MACD histogram (``macd - signal``)
+
+        Each value is a list aligned with *prices* and uses ``None`` where
+        not enough data points are available.
+
+    Examples
+    --------
+    >>> macd([1, 2, 3, ..., 30])
+    {'macd': [...], 'signal': [...], 'hist': [...]}  # doctest: +ELLIPSIS
+    """
+
     _validate_prices(prices)
     for p in (fastperiod, slowperiod, signalperiod):
         _validate_positive(p, "period parameter")
@@ -62,9 +118,25 @@ def macd(
         "signal": _to_list(signal_arr),
         "hist": _to_list(hist_arr),
     }
+# fmt: on
 
 
 def ema(prices: List[float], period: int = 10) -> List[float | None]:
+    """Exponential Moving Average (EMA).
+
+    Parameters
+    ----------
+    prices : List[float]
+        Close prices (chronological order).
+    period : int, default 10
+        EMA period length.
+
+    Returns
+    -------
+    List[float | None]
+        EMA values aligned with *prices*.
+    """
+
     _validate_prices(prices)
     _validate_period(period, prices)
     res = talib.EMA(np.array(prices, dtype=float), timeperiod=period)
@@ -72,18 +144,48 @@ def ema(prices: List[float], period: int = 10) -> List[float | None]:
 
 
 def sma(prices: List[float], period: int = 10) -> List[float | None]:
+    """Simple Moving Average (SMA).
+
+    Identical to Excel's *AVERAGE* over a sliding window.
+    """
+
     _validate_prices(prices)
     _validate_period(period, prices)
     res = talib.SMA(np.array(prices, dtype=float), timeperiod=period)
     return _to_list(res)
 
 
+# fmt: off
 def bbands(
     prices: List[float],
     period: int = 20,
     nbdevup: float = 2.0,
     nbdevdn: float = 2.0,
 ) -> Dict[str, List[float | None]]:
+    """Bollinger Bands® (BBANDS).
+
+    Parameters
+    ----------
+    prices : List[float]
+        Close prices.
+    period : int, default 20
+        Moving-average period.
+    nbdevup : float, default 2.0
+        Standard-deviation multiplier for the **upper** band.
+    nbdevdn : float, default 2.0
+        Standard-deviation multiplier for the **lower** band.
+
+    Returns
+    -------
+    dict
+        ``{"upper": [...], "middle": [...], "lower": [...]}``
+
+    Notes
+    -----
+    The *middle* band is simply a SMA of *prices*.  The *upper* / *lower*
+    bands are offset by ``nbdevup`` / ``nbdevdn`` standard deviations.
+    """
+
     _validate_prices(prices)
     _validate_period(period, prices)
     _validate_positive(nbdevup, "nbdevup")
@@ -99,3 +201,4 @@ def bbands(
         "middle": _to_list(middle),
         "lower": _to_list(lower),
     }
+# fmt: on
