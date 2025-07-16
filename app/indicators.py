@@ -1,6 +1,28 @@
 from __future__ import annotations
 
-from hexital import RSI, MACD, EMA, SMA, BBANDS, Candle
+import numpy as np
+import talib
+
+
+def _to_list(arr: np.ndarray) -> list[float | None]:
+    """Convert numpy array to list, handling NaN values."""
+    return [None if np.isnan(v) else float(v) for v in arr]
+
+
+def _validate_prices(prices: list[float]):
+    """Validate prices input."""
+    if not isinstance(prices, list) or not prices:
+        raise ValueError("'prices' must be a non-empty list")
+    if not all(isinstance(p, (int, float)) for p in prices):
+        raise ValueError("All price values must be numeric")
+
+
+def _validate_period(period: int, prices: list[float]):
+    """Validate period parameter."""
+    if period <= 0:
+        raise ValueError("period must be positive")
+    if period > len(prices):
+        raise ValueError("period cannot exceed length of prices")
 
 
 def rsi(prices: list[float], period: int = 14) -> list[float | None]:
@@ -17,24 +39,12 @@ def rsi(prices: list[float], period: int = 14) -> list[float | None]:
     Returns:
         List of RSI values with None for insufficient data periods
     """
-    if len(prices) < period:
-        return [None] * len(prices)
+    _validate_prices(prices)
+    _validate_period(period, prices)
     
-    # Convert prices to Candle objects (using price as OHLC since we only have close)
-    candles = [Candle(open=price, high=price, low=price, close=price, volume=1000) 
-               for price in prices]
-    
-    # Calculate RSI
-    rsi_indicator = RSI(candles=candles, period=period)
-    rsi_indicator.calculate()
-    
-    # Extract values
-    result = []
-    for candle in candles:
-        rsi_value = getattr(candle, f'RSI_{period}', None)
-        result.append(rsi_value if rsi_value is not None else None)
-    
-    return result
+    prices_arr = np.array(prices, dtype=float)
+    rsi_values = talib.RSI(prices_arr, timeperiod=period)
+    return _to_list(rsi_values)
 
 
 def macd(
@@ -57,40 +67,22 @@ def macd(
     Returns:
         Dictionary with 'macd', 'signal', and 'histogram' keys
     """
-    if len(prices) < max(fast, slow):
-        none_values = [None] * len(prices)
-        return {
-            "macd": none_values,
-            "signal": none_values,
-            "histogram": none_values,
-        }
+    _validate_prices(prices)
+    if fast <= 0 or slow <= 0 or signal <= 0:
+        raise ValueError("All periods must be positive")
+    if fast >= slow:
+        raise ValueError("fast period must be less than slow period")
+    _validate_period(slow, prices)
     
-    # Convert prices to Candle objects
-    candles = [Candle(open=price, high=price, low=price, close=price, volume=1000) 
-               for price in prices]
-    
-    # Calculate MACD
-    macd_indicator = MACD(candles=candles, fast=fast, slow=slow, signal=signal)
-    macd_indicator.calculate()
-    
-    # Extract values
-    macd_values = []
-    signal_values = []
-    histogram_values = []
-    
-    for candle in candles:
-        macd_val = getattr(candle, f'MACD_{fast}_{slow}_{signal}', None)
-        signal_val = getattr(candle, f'MACD_signal_{fast}_{slow}_{signal}', None)
-        histogram_val = getattr(candle, f'MACD_histogram_{fast}_{slow}_{signal}', None)
-        
-        macd_values.append(macd_val if macd_val is not None else None)
-        signal_values.append(signal_val if signal_val is not None else None)
-        histogram_values.append(histogram_val if histogram_val is not None else None)
+    prices_arr = np.array(prices, dtype=float)
+    macd_line, macd_signal_line, macd_histogram = talib.MACD(
+        prices_arr, fastperiod=fast, slowperiod=slow, signalperiod=signal
+    )
     
     return {
-        "macd": macd_values,
-        "signal": signal_values,
-        "histogram": histogram_values,
+        "macd": _to_list(macd_line),
+        "signal": _to_list(macd_signal_line),
+        "histogram": _to_list(macd_histogram),
     }
 
 
@@ -107,24 +99,12 @@ def ema(prices: list[float], period: int) -> list[float | None]:
     Returns:
         List of EMA values with None for insufficient data periods
     """
-    if len(prices) < period:
-        return [None] * len(prices)
+    _validate_prices(prices)
+    _validate_period(period, prices)
     
-    # Convert prices to Candle objects
-    candles = [Candle(open=price, high=price, low=price, close=price, volume=1000) 
-               for price in prices]
-    
-    # Calculate EMA
-    ema_indicator = EMA(candles=candles, period=period)
-    ema_indicator.calculate()
-    
-    # Extract values
-    result = []
-    for candle in candles:
-        ema_value = getattr(candle, f'EMA_{period}', None)
-        result.append(ema_value if ema_value is not None else None)
-    
-    return result
+    prices_arr = np.array(prices, dtype=float)
+    ema_values = talib.EMA(prices_arr, timeperiod=period)
+    return _to_list(ema_values)
 
 
 def sma(prices: list[float], period: int) -> list[float | None]:
@@ -140,24 +120,12 @@ def sma(prices: list[float], period: int) -> list[float | None]:
     Returns:
         List of SMA values with None for insufficient data periods
     """
-    if len(prices) < period:
-        return [None] * len(prices)
+    _validate_prices(prices)
+    _validate_period(period, prices)
     
-    # Convert prices to Candle objects
-    candles = [Candle(open=price, high=price, low=price, close=price, volume=1000) 
-               for price in prices]
-    
-    # Calculate SMA
-    sma_indicator = SMA(candles=candles, period=period)
-    sma_indicator.calculate()
-    
-    # Extract values
-    result = []
-    for candle in candles:
-        sma_value = getattr(candle, f'SMA_{period}', None)
-        result.append(sma_value if sma_value is not None else None)
-    
-    return result
+    prices_arr = np.array(prices, dtype=float)
+    sma_values = talib.SMA(prices_arr, timeperiod=period)
+    return _to_list(sma_values)
 
 
 def bbands(
@@ -178,38 +146,18 @@ def bbands(
     Returns:
         Dictionary with 'upper', 'middle', and 'lower' keys
     """
-    if len(prices) < period:
-        none_values = [None] * len(prices)
-        return {
-            "upper": none_values,
-            "middle": none_values,
-            "lower": none_values,
-        }
+    _validate_prices(prices)
+    _validate_period(period, prices)
+    if std_dev <= 0:
+        raise ValueError("std_dev must be positive")
     
-    # Convert prices to Candle objects
-    candles = [Candle(open=price, high=price, low=price, close=price, volume=1000) 
-               for price in prices]
-    
-    # Calculate Bollinger Bands
-    bb_indicator = BBANDS(candles=candles, period=period, std_dev=std_dev)
-    bb_indicator.calculate()
-    
-    # Extract values
-    upper_values = []
-    middle_values = []
-    lower_values = []
-    
-    for candle in candles:
-        upper_val = getattr(candle, f'BBANDS_upper_{period}_{std_dev}', None)
-        middle_val = getattr(candle, f'BBANDS_middle_{period}_{std_dev}', None)
-        lower_val = getattr(candle, f'BBANDS_lower_{period}_{std_dev}', None)
-        
-        upper_values.append(upper_val if upper_val is not None else None)
-        middle_values.append(middle_val if middle_val is not None else None)
-        lower_values.append(lower_val if lower_val is not None else None)
+    prices_arr = np.array(prices, dtype=float)
+    upper_band, middle_band, lower_band = talib.BBANDS(
+        prices_arr, timeperiod=period, nbdevup=std_dev, nbdevdn=std_dev
+    )
     
     return {
-        "upper": upper_values,
-        "middle": middle_values,
-        "lower": lower_values,
+        "upper": _to_list(upper_band),
+        "middle": _to_list(middle_band),
+        "lower": _to_list(lower_band),
     }
