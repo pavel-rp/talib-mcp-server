@@ -1,4 +1,12 @@
 import math
+import pathlib
+import sys
+
+# Add project root to PYTHONPATH for CI environments
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))
+
 import numpy as np
 import pytest
 import talib

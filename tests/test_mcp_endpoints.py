@@ -1,3 +1,11 @@
+import pathlib
+import sys
+
+# Ensure project root on sys.path
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))
+
 import pytest
 from starlette.testclient import TestClient
 
