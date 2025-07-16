@@ -1,1 +1,0 @@
-"""TA-Lib MCP Server application package."""
