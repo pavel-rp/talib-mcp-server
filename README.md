@@ -30,7 +30,12 @@ A production-ready [Model Context Protocol](https://modelcontextprotocol.io/) (M
 $ git clone <repo> && cd talib-mcp-server
 
 # 2. Install system deps (TA-Lib C library)
-$ sudo apt-get install libta-lib0 build-essential   # Debian/Ubuntu
+# Build TA-Lib C library (binary package often unavailable)
+$ sudo apt-get install -y build-essential wget
+$ wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+$ tar -xzf ta-lib-0.4.0-src.tar.gz && cd ta-lib
+$ ./configure --prefix=/usr && make -j"$(nproc)" && sudo make install
+$ cd .. && rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
 # 3. Create virtualenv & install Python deps
 $ python -m venv .venv && source .venv/bin/activate

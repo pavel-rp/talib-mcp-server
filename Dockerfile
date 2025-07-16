@@ -6,7 +6,18 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential libta-lib0 && \
+    apt-get install -y --no-install-recommends build-essential wget ca-certificates && \
+    # Build TA-Lib from source (binary package may be unavailable on some distros)
+    wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
+    tar -xzf ta-lib-0.4.0-src.tar.gz && \
+    cd ta-lib && \
+    ./configure --prefix=/usr && \
+    make -j"$(nproc)" && \
+    make install && \
+    cd /app && \
+    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz && \
+    ldconfig && \
+    apt-get purge -y --auto-remove wget && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
