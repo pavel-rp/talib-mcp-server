@@ -1,5 +1,5 @@
 fastmcp>=2.8,<3.0
-# TA-Lib-Precompiled>=0.4.0  # Uncomment when TA-Lib works with Python 3.13
+hexital>=3.0.0
 numpy<2.0
 python-dotenv>=1.0.0
 pydantic>=2.0
