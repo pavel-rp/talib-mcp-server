@@ -37,7 +37,7 @@ class BearerAuthMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):  # type: ignore[override]
         auth = request.headers.get("Authorization")
-        if not auth or not auth.startswith("Bearer "):
+        if not auth or not auth.lower().startswith("bearer "):
             return _unauthorized()
         token = auth.split(" ", 1)[1].strip()
         if token != self._api_key:
