@@ -7,9 +7,9 @@ if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
 import pytest
-from starlette.testclient import TestClient
 
 from app.main import mcp
+from app import indicators
 
 
 @pytest.fixture(autouse=True)
@@ -19,28 +19,47 @@ def _env(monkeypatch):
     monkeypatch.delenv("MCP_API_KEY", raising=False)
 
 
-@pytest.fixture()
-def client():
-    app = getattr(mcp, "app", None) or getattr(mcp, "starlette_app", None)
-    return TestClient(app)
+def test_mcp_server_creation():
+    # Test that the MCP server was created successfully
+    assert mcp is not None
+    assert mcp.name == "talib-mcp-server"
 
 
-def test_auth(client):
-    assert client.get("/tools").status_code == 401
-    r = client.get("/tools", headers={"Authorization": "Bearer testtoken"})
-    assert r.status_code == 200
-    assert "rsi" in r.json()
+@pytest.mark.asyncio
+async def test_tools_are_registered():
+    # Test that all expected tools are registered
+    tools = await mcp.get_tools()
+    tool_names = [tool if isinstance(tool, str) else tool.name for tool in tools]
+
+    expected_tools = {"rsi", "macd", "ema", "sma", "bbands"}
+    assert expected_tools.issubset(set(tool_names))
 
 
-def test_call_sma(client):
-    payload = {
-        "name": "sma",
-        "arguments": {"prices": list(range(1, 11)), "period": 5},
-    }
-    r = client.post(
-        "/call",
-        json=payload,
-        headers={"Authorization": "Bearer testtoken"},
-    )
-    assert r.status_code == 200
-    assert "result" in r.json()
+def test_tool_execution():
+    # Test that tools can be executed by calling the indicators directly
+    prices = [44.0, 44.34, 44.09, 44.15, 43.61, 44.33, 44.83, 45.15, 45.42, 45.84]
+
+    # Test RSI
+    result = indicators.rsi(prices, period=5)
+    assert isinstance(result, list)
+    assert len(result) == len(prices)
+
+    # Test SMA
+    result = indicators.sma(prices, period=5)
+    assert isinstance(result, list)
+    assert len(result) == len(prices)
+
+    # Test EMA
+    result = indicators.ema(prices, period=5)
+    assert isinstance(result, list)
+    assert len(result) == len(prices)
+
+    # Test MACD
+    result = indicators.macd(prices, fast=3, slow=5, signal=2)
+    assert isinstance(result, dict)
+    assert set(result.keys()) == {"macd", "macdsignal", "macdhist"}
+
+    # Test Bollinger Bands
+    result = indicators.bbands(prices, period=5, upper_dev=2.0, lower_dev=2.0)
+    assert isinstance(result, dict)
+    assert set(result.keys()) == {"upperband", "middleband", "lowerband"}

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict
 
 from dotenv import load_dotenv
 from fastmcp import FastMCP
@@ -31,11 +30,11 @@ def rsi(prices: list[float], period: int = 14) -> list[float | None]:
 @mcp.tool()
 def macd(
     prices: list[float],
-    fastperiod: int = 12,
-    slowperiod: int = 26,
-    signalperiod: int = 9,
+    fast: int = 12,
+    slow: int = 26,
+    signal: int = 9,
 ) -> dict[str, list[float | None]]:
-    return indicators.macd(prices, fastperiod, slowperiod, signalperiod)
+    return indicators.macd(prices, fast, slow, signal)
 
 
 @mcp.tool()
@@ -52,10 +51,14 @@ def sma(prices: list[float], period: int = 10) -> list[float | None]:
 def bbands(
     prices: list[float],
     period: int = 20,
-    nbdevup: float = 2.0,
-    nbdevdn: float = 2.0,
+    upper_dev: float = 2.0,
+    lower_dev: float = 2.0,
 ) -> dict[str, list[float | None]]:
-    return indicators.bbands(prices, period, nbdevup, nbdevdn)
+    return indicators.bbands(prices, period, upper_dev, lower_dev)
+
+
+# Expose app for testing
+app = mcp.http_app()
 
 
 if __name__ == "__main__":
