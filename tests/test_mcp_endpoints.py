@@ -54,12 +54,12 @@ def test_tool_execution():
     assert isinstance(result, list)
     assert len(result) == len(prices)
 
-    # Test MACD
+    # Test MACD - using correct dictionary keys
     result = indicators.macd(prices, fast=3, slow=5, signal=2)
     assert isinstance(result, dict)
-    assert set(result.keys()) == {"macd", "macdsignal", "macdhist"}
+    assert set(result.keys()) == {"macd", "signal", "histogram"}
 
-    # Test Bollinger Bands
-    result = indicators.bbands(prices, period=5, upper_dev=2.0, lower_dev=2.0)
+    # Test Bollinger Bands - using correct dictionary keys and parameter names
+    result = indicators.bbands(prices, period=5, std_dev=2.0)
     assert isinstance(result, dict)
-    assert set(result.keys()) == {"upperband", "middleband", "lowerband"}
+    assert set(result.keys()) == {"upper", "middle", "lower"}

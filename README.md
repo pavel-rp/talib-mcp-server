@@ -89,6 +89,113 @@ Authorization: Bearer <token>
 
 The token must match the value of `MCP_API_KEY` (via environment variable or `.env` file). Unauthorized requests receive `401 {"error": "Unauthorized"}`.
 
+## Example API Calls
+
+Here are some example HTTP requests to demonstrate how to use the MCP server:
+
+### RSI (Relative Strength Index)
+
+```bash
+curl -X POST http://localhost:8000/call \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "rsi",
+    "arguments": {
+      "prices": [44.0, 44.34, 44.09, 44.15, 43.61, 44.33, 44.83, 45.15, 45.42, 45.84, 46.08, 45.89, 46.03, 46.28, 46.28],
+      "period": 14
+    }
+  }'
+```
+
+### MACD (Moving Average Convergence Divergence)
+
+```bash
+curl -X POST http://localhost:8000/call \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "macd",
+    "arguments": {
+      "prices": [12.0, 12.5, 13.0, 12.8, 13.2, 13.1, 13.5, 13.3, 13.8, 14.0, 14.2, 13.9, 14.1, 14.5, 14.3],
+      "fast": 12,
+      "slow": 26,
+      "signal": 9
+    }
+  }'
+```
+
+Response:
+```json
+{
+  "macd": [null, null, ..., 0.123],
+  "signal": [null, null, ..., 0.089], 
+  "histogram": [null, null, ..., 0.034]
+}
+```
+
+### Simple Moving Average (SMA)
+
+```bash
+curl -X POST http://localhost:8000/call \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "sma",
+    "arguments": {
+      "prices": [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+      "period": 5
+    }
+  }'
+```
+
+### Exponential Moving Average (EMA)
+
+```bash
+curl -X POST http://localhost:8000/call \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "ema",
+    "arguments": {
+      "prices": [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+      "period": 10
+    }
+  }'
+```
+
+### Bollinger Bands
+
+```bash
+curl -X POST http://localhost:8000/call \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "bbands",
+    "arguments": {
+      "prices": [20, 21, 19, 22, 20, 23, 21, 24, 22, 25, 23, 26, 24, 27, 25, 28, 26, 29, 27, 30],
+      "period": 20,
+      "std_dev": 2.0
+    }
+  }'
+```
+
+Response:
+```json
+{
+  "upper": [null, null, ..., 25.8],
+  "middle": [null, null, ..., 23.5],
+  "lower": [null, null, ..., 21.2]
+}
+```
+
+### Getting Available Tools
+
+```bash
+curl -X GET http://localhost:8000/tools \
+  -H "Authorization: Bearer your-api-key"
+```
+
 ## Local development
 
 ```bash
